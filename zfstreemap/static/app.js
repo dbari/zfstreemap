@@ -4,6 +4,9 @@
   const PAD = 3; // inset of a dataset's children from its border, px
   const HEADER_H = 18; // height of a dataset's name bar, px
   const MIN_BOX = 2; // boxes smaller than this in either dimension are not drawn, px
+  const MIN_POOL_W = 96; // top-level pools are drawn at least this big, so small pools stay visible
+  const MIN_POOL_H = 64;
+  const MIN_POOL_AREA = MIN_POOL_W * MIN_POOL_H * 1.1; // small margin so rounding never drops a pool below the minimum
 
   const $ = (id) => document.getElementById(id);
   const mapEl = $("map");
@@ -90,14 +93,62 @@
     return items.sort((a, b) => b.value - a.value);
   }
 
-  // Squarified treemap (Bruls, Huizing, van Wijk). Returns one rectangle per item.
-  function squarify(items, rect) {
+  // Weights used for layout. Items whose area would fall below minArea are
+  // raised to the smallest weight that gives minArea, so the rest shrink a bit.
+  function layoutWeights(items, rect, minArea) {
+    const area = rect.w * rect.h;
+    const values = items.map((it) => it.value);
+    const total = values.reduce((sum, v) => sum + v, 0);
+    if (!(minArea > 0) || items.length * minArea >= area) return values;
+
+    // The floor depends on the total it will be part of, so iterate to a fixed point.
+    let sum = total;
+    for (let i = 0; i < 50; i++) {
+      const floor = (minArea * sum) / area;
+      const next = values.reduce((s, v) => s + Math.max(v, floor), 0);
+      if (Math.abs(next - sum) <= 1e-9 * total) break;
+      sum = next;
+    }
+    const floor = (minArea * sum) / area;
+    return values.map((v) => Math.max(v, floor));
+  }
+
+  // Top-level pools. A pool too small for MIN_POOL_W x MIN_POOL_H is placed in a strip
+  // along the bottom of the map at that minimum height; the other pools are laid out
+  // proportionally above the strip.
+  function layoutPools(items, rect) {
     const total = items.reduce((sum, it) => sum + it.value, 0);
+    if (!(total > 0)) return [];
+    const scale = (rect.w * rect.h) / total;
+    const small = items.filter((it) => it.value * scale < MIN_POOL_AREA);
+    const big = items.filter((it) => it.value * scale >= MIN_POOL_AREA);
+    if (!small.length || rect.h < 2 * MIN_POOL_H) return squarify(items, rect, MIN_POOL_AREA);
+
+    const stripH = MIN_POOL_H;
+    const stripY = rect.y + rect.h - stripH;
+    const weights = layoutWeights(small, { w: rect.w, h: stripH }, MIN_POOL_W * stripH * 1.1);
+    const weightSum = weights.reduce((sum, w) => sum + w, 0);
+    const out = [];
+    let x = rect.x;
+    small.forEach((item, i) => {
+      const w = (weights[i] / weightSum) * rect.w;
+      out.push({ item, x, y: stripY, w, h: stripH });
+      x += w;
+    });
+    const bigRect = { x: rect.x, y: rect.y, w: rect.w, h: rect.h - stripH };
+    return out.concat(squarify(big, bigRect));
+  }
+
+  // Squarified treemap (Bruls, Huizing, van Wijk). Returns one rectangle per item.
+  // minArea (optional) is the smallest area any item may be drawn with, in px².
+  function squarify(items, rect, minArea = 0) {
+    const weights = layoutWeights(items, rect, minArea);
+    const total = weights.reduce((sum, w) => sum + w, 0);
     const out = [];
     if (!(total > 0) || rect.w <= 0 || rect.h <= 0) return out;
 
     const scale = (rect.w * rect.h) / total;
-    const cells = items.map((item) => ({ item, area: item.value * scale }));
+    const cells = items.map((item, i) => ({ item, area: weights[i] * scale }));
 
     let r = { ...rect };
     let row = [];
@@ -194,7 +245,8 @@
     const inner = { x: rect.x + pad, y: top, w: rect.w - 2 * pad, h: rect.y + rect.h - pad - top };
     if (inner.w < MIN_BOX * 3 || inner.h < MIN_BOX * 3) return;
 
-    for (const placed of squarify(itemsFor(node), inner)) {
+    const placements = isRoot ? layoutPools(itemsFor(node), inner) : squarify(itemsFor(node), inner);
+    for (const placed of placements) {
       if (placed.w < MIN_BOX || placed.h < MIN_BOX) continue;
       switch (placed.item.kind) {
         case "dataset":
