@@ -1,0 +1,250 @@
+:root {
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: #222;
+  background: #f4f4f6;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #c8c8cf;
+  background: #fff;
+}
+
+#crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+#crumbs button {
+  border: none;
+  background: none;
+  padding: 2px 4px;
+  color: #1f5fbf;
+  cursor: pointer;
+  font: inherit;
+}
+
+#crumbs button:hover {
+  text-decoration: underline;
+}
+
+#crumbs .current {
+  font-weight: 600;
+  padding: 2px 4px;
+}
+
+#crumbs .sep {
+  color: #999;
+}
+
+#summary {
+  color: #555;
+}
+
+.legend {
+  display: flex;
+  gap: 12px;
+  color: #555;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  vertical-align: -2px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.swatch.ds {
+  background: hsl(210, 40%, 84%);
+}
+
+.swatch.free {
+  background: repeating-linear-gradient(45deg, #ffffff 0 3px, #dcdce2 3px 6px);
+  border-style: dashed;
+}
+
+.swatch.snap {
+  background: repeating-linear-gradient(-45deg, #f7d58a 0 3px, #eeb545 3px 6px);
+}
+
+.spacer {
+  flex: 1;
+}
+
+#status {
+  color: #555;
+}
+
+#status.error {
+  color: #b00020;
+}
+
+button#refresh {
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+button#refresh:disabled {
+  cursor: progress;
+}
+
+#map {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.box {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.box.ds {
+  background: hsl(var(--hue) 40% calc(86% - var(--depth) * 4%));
+}
+
+.box.ds.root {
+  background: none;
+  border: none;
+}
+
+.box.free {
+  background: repeating-linear-gradient(45deg, #ffffff 0 8px, #e4e4ea 8px 16px);
+  border: 1px dashed rgba(0, 0, 0, 0.35);
+}
+
+.box.snap {
+  background: repeating-linear-gradient(-45deg, #f7d58a 0 8px, #eeb545 8px 16px);
+}
+
+.box.ds:hover,
+.box.free:hover,
+.box.snap:hover {
+  outline: 2px solid #1f5fbf;
+  outline-offset: -2px;
+}
+
+.box.snap {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.box .label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 18px;
+  line-height: 18px;
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #111;
+  pointer-events: none;
+}
+
+.box.snap .label {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 0 0 3px 0;
+  width: fit-content;
+  max-width: 100%;
+}
+
+#tooltip {
+  position: fixed;
+  z-index: 10;
+  max-width: 380px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(25, 25, 30, 0.95);
+  color: #f2f2f2;
+  font-size: 12px;
+  line-height: 1.45;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+#tooltip .title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+
+#tooltip .row {
+  display: flex;
+  gap: 10px;
+}
+
+#tooltip .row .k {
+  color: #aaa;
+  min-width: 90px;
+}
+
+#tooltip .note {
+  margin-top: 4px;
+  color: #bbb;
+  font-style: italic;
+}
+
+#busy {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 28px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  color: #333;
+  pointer-events: none;
+}
+
+#busy .spinner {
+  width: 36px;
+  height: 36px;
+  border: 4px solid #d6dcea;
+  border-top-color: #1f5fbf;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zfstreemap"
+version = "0.1.0"
+description = "Interactive treemap of ZFS dataset and snapshot space usage"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+zfstreemap = "zfstreemap.__main__:main"
+
+[tool.setuptools]
+packages = ["zfstreemap"]
+
+[tool.setuptools.package-data]
+zfstreemap = ["static/*"]

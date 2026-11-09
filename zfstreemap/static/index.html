@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZFS space explorer</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <nav id="crumbs" aria-label="Dataset path"></nav>
+    <div id="summary"></div>
+    <div class="legend">
+      <span><i class="swatch ds"></i>dataset</span>
+      <span><i class="swatch snap"></i>snapshots (all combined)</span>
+      <span><i class="swatch free"></i>free space</span>
+    </div>
+    <div class="spacer"></div>
+    <span id="status"></span>
+    <button id="refresh" type="button">Refresh</button>
+  </header>
+  <main id="map"></main>
+  <div id="busy" role="status" aria-live="polite" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <div>Querying ZFS…</div>
+  </div>
+  <div id="tooltip" role="tooltip" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>
