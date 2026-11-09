@@ -88,3 +88,7 @@ python3 -m unittest
 ```
 
 The tests use fake `zfs` output and do not need ZFS installed.
+
+## License
+
+BSD 3-Clause. See [LICENSE](LICENSE).
