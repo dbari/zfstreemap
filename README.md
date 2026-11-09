@@ -5,6 +5,8 @@ box sized by the space it uses, and child datasets are nested inside their paren
 Each dataset's snapshots are combined into a single block, so there is no
 per-snapshot clutter. Each pool also shows its free space as a block.
 
+![zfstreemap showing four sample pools](docs/screenshot.png)
+
 ## Requirements
 
 - Python 3.9 or newer (standard library only, no pip dependencies)
